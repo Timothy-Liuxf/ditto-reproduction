@@ -5,10 +5,11 @@
 ```mermaid
 graph TD
 
+sr_customer_sk_sr_store_sk((groupby))
 store_returns((select)) --> sr_customer_sk_sr_store_sk
 date_dim((select)) --> sr_customer_sk_sr_store_sk
 customer_total_return_ctr1((select))
-sr_customer_sk_sr_store_sk((groupby)) --> customer_total_return_ctr1((select))
+sr_customer_sk_sr_store_sk --> customer_total_return_ctr1
 
 customer_total_return_ctr2((select))
 sr_customer_sk_sr_store_sk --> customer_total_return_ctr2
