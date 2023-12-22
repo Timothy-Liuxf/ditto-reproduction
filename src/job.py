@@ -12,7 +12,7 @@ class VirtualStage(Stage):
         # TODO: Add more fields
 
 class Job:
-    def __init__(self, stages: List[Stage], edges: Dict[Tuple[int, int], float], nslot: int) -> None:
+    def __init__(self, stages: Dict[int,Stage], edges: Dict[Tuple[int, int], float], nslot: int) -> None:
         '''
         stages: List[Stage] is a list of stages in the job
         edges: Dict[Tuple[int, int], float] is a dictionary of edges between stages
