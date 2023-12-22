@@ -25,3 +25,18 @@ customer --> c_customer_id
 
 
 
+## Q95
+
+```mermaid
+graph TD
+
+map1((map1)) --> groupby((groupby))
+groupby --> reduce1((reduce1))
+reduce1 --> join1((join1))
+map2((map2)) --> join1
+map3((map3)) --> join1
+map4((map4)) --> join2((join2))
+join1 --> join2
+join2 --> reduce2((reduce2))
+```
+
