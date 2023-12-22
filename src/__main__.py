@@ -36,8 +36,8 @@ def main():
                     raise Exception(f"Stage {child_name} not found")
                 edges[(stage_lookup[stage_name], stage_lookup[child_name])] = child["weight"]
 
-        print("Stages: {}".format(stages))
-        print("Edges: {}".format(edges))
+        # print("Stages: {}".format(stages))
+        # print("Edges: {}".format(edges))
 
         job = Job(stages, edges, 100) # TODO: Change nslots
         print("Ditto: {}".format(joint_optimization(job.copy(), [], Strategy.DITTO)))
