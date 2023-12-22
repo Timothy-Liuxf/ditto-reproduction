@@ -1,0 +1,110 @@
+[
+    {
+        "name": "q1",
+        "stages": [
+            {
+                "name": "store_returns",
+                "type": "select",
+                "alpha": 0,
+                "beta": 0,
+                "children": [
+                    {
+                        "name": "sr_customer_sk_sr_store_sk",
+                        "weight": 0
+                    }
+                ]
+            },
+            {
+                "name": "date_dim",
+                "type": "select",
+                "alpha": 0,
+                "beta": 0,
+                "children": [
+                    {
+                        "name": "sr_customer_sk_sr_store_sk",
+                        "weight": 0
+                    }
+                ]
+            },
+            {
+                "name": "customer_total_return_ctr1",
+                "type": "select",
+                "alpha": 0,
+                "beta": 0,
+                "children": [
+                    {
+                        "name": "store",
+                        "weight": 0
+                    },
+                    {
+                        "name": "c_customer_id",
+                        "weight": 0
+                    }
+                ]
+            },
+            {
+                "name": "sr_customer_sk_sr_store_sk",
+                "type": "groupby",
+                "alpha": 0,
+                "beta": 0,
+                "children": [
+                    {
+                        "name": "customer_total_return_ctr1",
+                        "weight": 0
+                    },
+                    {
+                        "name": "customer_total_return_ctr2",
+                        "weight": 0
+                    }
+                ]
+            },
+            {
+                "name": "customer_total_return_ctr2",
+                "type": "select",
+                "alpha": 0,
+                "beta": 0,
+                "children": [
+                    {
+                        "name": "customer_total_return_ctr1",
+                        "weight": 0
+                    }
+                ]
+            },
+            {
+                "name": "store",
+                "type": "select",
+                "alpha": 0,
+                "beta": 0,
+                "children": [
+                    {
+                        "name": "c_customer_id",
+                        "weight": 0
+                    }
+                ]
+            },
+            {
+                "name": "customer",
+                "type": "select",
+                "alpha": 0,
+                "beta": 0,
+                "children": [
+                    {
+                        "name": "customer_total_return_ctr1",
+                        "weight": 0
+                    },
+                    {
+                        "name": "c_customer_id",
+                        "weight": 0
+                    }
+                ]
+            },
+            {
+                "name": "c_customer_id",
+                "type": "orderby",
+                "alpha": 0,
+                "beta": 0,
+                "children": []
+            }
+        ]
+    }
+]
