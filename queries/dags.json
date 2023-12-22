@@ -106,5 +106,113 @@
                 "children": []
             }
         ]
+    },
+    {
+        "name": "q95",
+        "stages": [
+            {
+                "name": "map1",
+                "type": "map",
+                "alpha": 0,
+                "beta": 0,
+                "children": [
+                    {
+                        "name": "groupby",
+                        "weight": 0
+                    }
+                ]
+            },
+            {
+                "name": "groupby",
+                "type": "groupby",
+                "alpha": 0,
+                "beta": 0,
+                "children": [
+                    {
+                        "name": "reduce1",
+                        "weight": 0
+                    }
+                ]
+            },
+            {
+                "name": "reduce1",
+                "type": "reduce",
+                "alpha": 0,
+                "beta": 0,
+                "children": [
+                    {
+                        "name": "join1",
+                        "weight": 0
+                    }
+                ]
+            },
+            {
+                "name": "map2",
+                "type": "map",
+                "alpha": 0,
+                "beta": 0,
+                "children": [
+                    {
+                        "name": "join1",
+                        "weight": 0
+                    }
+                ]
+            },
+            {
+                "name": "map3",
+                "type": "map",
+                "alpha": 0,
+                "beta": 0,
+                "children": [
+                    {
+                        "name": "join1",
+                        "weight": 0
+                    }
+                ]
+            },
+            {
+                "name": "map4",
+                "type": "map",
+                "alpha": 0,
+                "beta": 0,
+                "children": [
+                    {
+                        "name": "join2",
+                        "weight": 0
+                    }
+                ]
+            },
+            {
+                "name": "join1",
+                "type": "join",
+                "alpha": 0,
+                "beta": 0,
+                "children": [
+                    {
+                        "name": "join2",
+                        "weight": 0
+                    }
+                ]
+            },
+            {
+                "name": "join2",
+                "type": "join",
+                "alpha": 0,
+                "beta": 0,
+                "children": [
+                    {
+                        "name": "reduce2",
+                        "weight": 0
+                    }
+                ]
+            },
+            {
+                "name": "reduce2",
+                "type": "reduce",
+                "alpha": 0,
+                "beta": 0,
+                "children": []
+            }
+        ]
     }
 ]
