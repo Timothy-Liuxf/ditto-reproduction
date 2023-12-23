@@ -214,5 +214,115 @@
                 "children": []
             }
         ]
+    },
+    {
+        "name": "t0",
+        "stages": [
+            {
+                "name": "s0",
+                "type": "stage",
+                "alpha": 0,
+                "beta": 0,
+                "children": [
+                    {
+                        "name": "s1",
+                        "weight": 0
+                    },
+                    {
+                        "name": "s5",
+                        "weight": 0
+                    }
+                ]
+            },
+            {
+                "name": "s1",
+                "type": "stage",
+                "alpha": 0,
+                "beta": 0,
+                "children": [
+                    {
+                        "name": "s2",
+                        "weight": 0
+                    },
+                    {
+                        "name": "s3",
+                        "weight": 0
+                    }
+                ]
+            },
+            {
+                "name": "s2",
+                "type": "stage",
+                "alpha": 0,
+                "beta": 0,
+                "children": [
+                    {
+                        "name": "s4",
+                        "weight": 0
+                    }
+                ]
+            },
+            {
+                "name": "s3",
+                "type": "stage",
+                "alpha": 0,
+                "beta": 0,
+                "children": []
+            },
+            {
+                "name": "s4",
+                "type": "stage",
+                "alpha": 0,
+                "beta": 0,
+                "children": [
+                    {
+                        "name": "s8",
+                        "weight": 0
+                    }
+                ]
+            },
+            {
+                "name": "s5",
+                "type": "stage",
+                "alpha": 0,
+                "beta": 0,
+                "children": [
+                    {
+                        "name": "s4",
+                        "weight": 0
+                    },
+                    {
+                        "name": "s6",
+                        "weight": 0
+                    }
+                ]
+            },
+            {
+                "name": "s6",
+                "type": "stage",
+                "alpha": 0,
+                "beta": 0,
+                "children": [
+                    {
+                        "name": "s7",
+                        "weight": 0
+                    }
+                ]
+            },
+            {
+                "name": "s7",
+                "type": "stage",
+                "alpha": 0,
+                "beta": 0,
+                "children": []
+            },
+            {
+                "name": "s8",
+                "type": "stage",
+                "alpha": 0,
+                "beta": 0,
+                "children": []
+            }
+        ]
     }
 ]
