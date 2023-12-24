@@ -75,7 +75,7 @@ def joint_optimization(job: Job, servers: List[Server], strategy: Strategy) -> f
         bottom_up_dop(job)
 
         # E𝑔 and E𝑢 store grouped and ungrouped edges, respectively
-        Eg = []
+        Eg = None
         Eu = list(job.edges.keys())
         # stage_ids = list(job.stages.keys())
         # grouped_stages = [[id] for id in stage_ids]
@@ -91,7 +91,7 @@ def joint_optimization(job: Job, servers: List[Server], strategy: Strategy) -> f
                 if tmp == 0: break
 
                 job.edges[edge] = 0
-                Eg.append(edge)
+                Eg = edge
                 # si = edge[0]
                 # sj = edge[1]
 
@@ -100,44 +100,41 @@ def joint_optimization(job: Job, servers: List[Server], strategy: Strategy) -> f
                 # for grouped_stage in new_grouped_stages:
                 # pass
 
-                # can_place check if current grouped_stages can be placed into the server list if possible
-                if can_place(servers, job, Eg):
+                # place check if current grouped_stages can be placed into the server list
+                # can put them into the server if possible
+                if place(servers, job, Eg):
                     Eu.remove(edge)
                     break
                 else:
                     # Undo grouping 𝑠𝑖 and 𝑠𝑗, and restore 𝐷𝑜𝑃
                     # Undo line 11 and 12
                     job.edges[edge] = tmp
-                    Eg.remove(edge)
+                    Eg = None
 
             # if No edge in E𝑢 is grouped in the above loop then break
             if len(Eu) == Eu_len:
                 break
 
-            # place current grouped stages into the server
-            place(servers, job, Eg)
-            Eg = []
-
     elif strategy == Strategy.AVERAGE:
 
         # All stages have the same Dop
-        for stage in job.stages.values():
+        for id, stage in job.stages.items():
             stage.nslot = round(job.nslot / len(list(job.stages.keys())))
 
             # Randomly place each stage into available server
             for server in servers:
-                if server.can_place(stage):
-                    server.place(stage)
+                if server.can_place((id, stage)):
+                    server.place((id, stage))
 
     elif strategy == Strategy.RATIO:
 
         # Compute k, which is the propotion
         total_alpha = 0
-        for stage in job.stages.values():
+        for id, stage in job.stages.items():
             total_alpha += stage.alpha
 
         # Stage Dop is propotional to the stage alpha value
-        for stage in job.stages.values():
+        for id, stage in job.stages.items():
             try:
                 stage.nslot = round(job.nslot * stage.alpha / total_alpha)
             except ZeroDivisionError:
@@ -145,8 +142,8 @@ def joint_optimization(job: Job, servers: List[Server], strategy: Strategy) -> f
 
             # Randomly place each stage into available server
             for server in servers:
-                if server.can_place(stage):
-                    server.place(stage)
+                if server.can_place((id, stage)):
+                    server.place((id, stage))
 
     '''
     For JCT optimization, the weight of node 𝑠𝑖 is 𝐶(𝑠𝑖), and the weight of (𝑠𝑖, 𝑠𝑗) is 𝑊 (𝑠𝑖) + 𝑅(𝑠𝑗).
@@ -156,7 +153,7 @@ def joint_optimization(job: Job, servers: List[Server], strategy: Strategy) -> f
     total_execution_time = 0
 
     # Find current graph critical path to compute total time
-    critical_path_edge_attributes = longest_path_dag_with_weights_and_path(list(job.stages.keys()), job.edges)
+    critical_path_edge_attributes = longest_path_dag_with_weights_and_path(job.stages, job.edges)
 
     for i in range(len(critical_path_edge_attributes)):
         start_stage = job.stages[critical_path_edge_attributes[i][1]]
@@ -186,55 +183,59 @@ def build_group_stages(job : Job, Eg : List[Tuple[int, int]]) -> Set[Stage]:
     servers : Avaliable server with constraints
     job: current job
     Eg: current grouped stages represented with edges
-
-    Note: grouped stages may not be fully connected
 '''
-def can_place(servers : List[Server], job : Job, Eg : List[Tuple[int, int]]) -> bool:
-
-    group_stages = build_group_stages(job, Eg)
-    for stage in group_stages.copy():
-        # Check if s is placed somewhere in the server list
-        for server in servers:
-            if stage in server.placed_stages:
-                group_stages.remove(stage)
-                break
-
-    total_slots_need = 0
-    for stage in group_stages:
-        total_slots_need += stage.nslot
-
-    for server in servers:
-        if server.available_slots >= total_slots_need:
-            return True
-
-    return False
-
-
-def place(servers : List[Server], job : Job, Eg : List[Tuple[int, int]]) -> None:
-
-    group_stages = build_group_stages(job, Eg)
-    for stage in group_stages.copy():
-        # Check if s is placed somewhere in the server list
-        for server in servers:
-            if stage in server.placed_stages:
-                group_stages.remove(stage)
-                break
-
-    total_slots_need = 0
-    for stage in group_stages:
-        total_slots_need += stage.nslot
+def place(servers : List[Server], job : Job, Eg : Tuple[int, int]) -> bool:
 
     # sort server based on the curret available slots:
     sorted_servers = sorted(servers, key=lambda server: server.available_slots, reverse=True)
 
-    # Place the group into the server with the nearest function slot number
+    start_placed_server = -1
+    end_placed_server = -1
+    start_stage = job.stages[Eg[0]]
+    end_stage = job.stages[Eg[1]]
+
+    # Check if stage is placed somewhere in the server list
+    for i, server in enumerate(servers):
+        if Eg[0] in server.placed_stages:
+            start_placed_server = i
+        if Eg[1] in server.placed_stages:
+            end_placed_server = i
+
     chosen_server = None
-    for server in sorted_servers:
-        if server.available_slots >= total_slots_need:
-            chosen_server = server
-        else:
+    if start_placed_server >= 0 and end_placed_server >= 0:
+        return True
+
+    elif start_placed_server < 0 and end_placed_server < 0:
+        total_slots_need = start_stage.nslot + end_stage.nslot
+
+        # Place the group into the server with the nearest function slot number
+        for server in sorted_servers:
+            if server.available_slots >= total_slots_need:
+                chosen_server = server
+            else:
+                if chosen_server:
+                    chosen_server.available_slots -= total_slots_need
+                    chosen_server.placed_stages[Eg[0]] = start_stage
+                    chosen_server.placed_stages[Eg[1]] = end_stage
+
+    elif start_placed_server >= 0 and end_placed_server < 0:
+        total_slots_need = end_stage.nslot
+
+        if servers[start_placed_server].available_slots >= total_slots_need:
+            chosen_server = servers[start_placed_server]
             chosen_server.available_slots -= total_slots_need
-            chosen_server.placed_stages += group_stages
+            chosen_server.placed_stages[Eg[1]] = end_stage
+
+    elif start_placed_server < 0 and end_placed_server >= 0:
+        total_slots_need = start_stage.nslot
+
+        if servers[end_placed_server].available_slots >= total_slots_need:
+            chosen_server = servers[end_placed_server]
+            chosen_server.available_slots -= total_slots_need
+            chosen_server.placed_stages[Eg[0]] = start_stage
+
+    if not chosen_server: return False
+    return True
 
 
 '''
@@ -260,7 +261,7 @@ def greedy_group(job : Job):
 
     while E:
         # find the critical path of the DAG (V, E)
-        critical_path_edge_attributes = longest_path_dag_with_weights_and_path(list(job.stages.keys()), job.edges)
+        critical_path_edge_attributes = longest_path_dag_with_weights_and_path(job.stages, job.edges)
 
         # find the edge with the largest weight in 𝐶𝑃
         max_weight = 0
@@ -283,27 +284,30 @@ def greedy_group(job : Job):
 
 '''
     Find critical path in current DAG
+    path length includes both node cost and weight cost
     return : list[(si, sj, w)]
 '''
-def longest_path_dag_with_weights_and_path(nodes : List[int], edges : Dict[Tuple[int, int], float]) -> List[Tuple[int, int, float]]:
+def longest_path_dag_with_weights_and_path(nodes : Dict[int, Stage], edges : Dict[Tuple[int, int], float]) -> List[Tuple[int, int, float]]:
 
     # find path starting points
-    graph = {node: [] for node in nodes}
-    in_degree = {node: 0 for node in nodes}
-    edge_costs = {node: [] for node in nodes}
+    graph = {node: [] for node in nodes.keys()}
+    in_degree = {node: 0 for node in nodes.keys()}
+    edge_costs = {node: [] for node in nodes.keys()}
+    node_costs = {node: stage.alpha / stage.nslot + stage.beta for node, stage in nodes.items()}
 
     for edge, weight in edges.items():
         in_degree[edge[1]] += 1
         graph[edge[0]].append(edge[1])
         edge_costs[edge[0]].append(weight)
 
-    path = {node: [] for node in nodes}
-    distance_with_cost = {node: 0 for node in nodes}
-    start_nodes = [node for node in nodes if in_degree[node] == 0]
+    path = {node: [] for node in nodes.keys()}
+    distance_with_cost = {node: 0 for node in nodes.keys()}
+    start_nodes = [node for node in nodes.keys() if in_degree[node] == 0]
 
     for root_node in start_nodes:
         path[root_node].append(root_node)
-        dfs_with_weights_and_path(root_node, graph, edge_costs, in_degree, path, distance_with_cost)
+        distance_with_cost[root_node] = node_costs[root_node]
+        dfs_with_weights_and_path(root_node, graph, edge_costs, node_costs, in_degree, path, distance_with_cost)
 
     max_node = max(distance_with_cost, key=distance_with_cost.get)
     critical_path = path[max_node]
@@ -316,7 +320,7 @@ def longest_path_dag_with_weights_and_path(nodes : List[int], edges : Dict[Tuple
     return critical_path_edge_attributes
 
 
-def dfs_with_weights_and_path(root_node, graph, edge_costs, in_degree, path, distance_with_cost):
+def dfs_with_weights_and_path(root_node, graph, edge_costs, node_costs, in_degree, path, distance_with_cost):
 
     for i, neighbor in enumerate(graph[root_node]):
 
@@ -326,14 +330,14 @@ def dfs_with_weights_and_path(root_node, graph, edge_costs, in_degree, path, dis
         # print(neighbor, in_degree[neighbor])
         in_degree[neighbor] -= 1
 
-        new_distance = distance_with_cost[root_node] + edge_costs[root_node][i]
+        new_distance = distance_with_cost[root_node] + edge_costs[root_node][i] + node_costs[neighbor]
 
         if new_distance > distance_with_cost[neighbor]:
             path[neighbor] = path[root_node] + [neighbor]
             distance_with_cost[neighbor] = new_distance
 
         if in_degree[neighbor] == 0:
-            dfs_with_weights_and_path(neighbor, graph, edge_costs, in_degree, path, distance_with_cost)
+            dfs_with_weights_and_path(neighbor, graph, edge_costs, node_costs, in_degree, path, distance_with_cost)
 
 
 '''
