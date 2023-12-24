@@ -1,5 +1,6 @@
 import argparse
 import json
+import time
 from joint_optimization import *
 from typing import List, Dict
 
@@ -60,14 +61,27 @@ def main():
             33,
             20,
         ]
+        # print(len(server_slots))
         # test legality: sum(server_pool) >= nslots
         total_slots = sum(n for n in server_slots)
         assert total_slots >= nslots
         server_pool = [Server(n) for n in server_slots]
 
-        print("Ditto: {}".format(joint_optimization(job.copy(), copy_server_pool(server_pool), Strategy.DITTO)))
-        print("Average: {}".format(joint_optimization(job.copy(), copy_server_pool(server_pool), Strategy.AVERAGE)))
-        print("Ratio: {}".format(joint_optimization(job.copy(), copy_server_pool(server_pool), Strategy.RATIO)))
+        start_time_ditto = time.time()
+        ditto_time = joint_optimization(job.copy(), copy_server_pool(server_pool), Strategy.DITTO)
+        end_time_ditto = time.time()
+
+        start_time_ratio = time.time()
+        ratio_time = joint_optimization(job.copy(), copy_server_pool(server_pool), Strategy.RATIO)
+        end_time_ratio = time.time()
+
+        start_time_average = time.time()
+        average_time = joint_optimization(job.copy(), copy_server_pool(server_pool), Strategy.AVERAGE)
+        end_time_average = time.time()
+
+        print(f"Ditto: {ditto_time}, execution time: {end_time_ditto - start_time_ditto}")
+        print(f"Ratio: {ratio_time}, execution time: {end_time_ratio - start_time_ratio}")
+        print(f"Average: {average_time}, execution time: {end_time_average - start_time_average}")
         print()
 
 if __name__ == "__main__":
