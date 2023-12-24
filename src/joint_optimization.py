@@ -75,7 +75,7 @@ def joint_optimization(job: Job, servers: List[Server], strategy: Strategy) -> f
         bottom_up_dop(job)
 
         # E𝑔 and E𝑢 store grouped and ungrouped edges, respectively
-        Eg = []
+        Eg = None
         Eu = list(job.edges.keys())
         # stage_ids = list(job.stages.keys())
         # grouped_stages = [[id] for id in stage_ids]
@@ -91,7 +91,7 @@ def joint_optimization(job: Job, servers: List[Server], strategy: Strategy) -> f
                 if tmp == 0: break
 
                 job.edges[edge] = 0
-                Eg.append(edge)
+                Eg = edge
                 # si = edge[0]
                 # sj = edge[1]
 
@@ -100,44 +100,41 @@ def joint_optimization(job: Job, servers: List[Server], strategy: Strategy) -> f
                 # for grouped_stage in new_grouped_stages:
                 # pass
 
-                # can_place check if current grouped_stages can be placed into the server list if possible
-                if can_place(servers, job, Eg):
+                # place check if current grouped_stages can be placed into the server list
+                # can put them into the server if possible
+                if place(servers, job, Eg):
                     Eu.remove(edge)
                     break
                 else:
                     # Undo grouping 𝑠𝑖 and 𝑠𝑗, and restore 𝐷𝑜𝑃
                     # Undo line 11 and 12
                     job.edges[edge] = tmp
-                    Eg.remove(edge)
+                    Eg = None
 
             # if No edge in E𝑢 is grouped in the above loop then break
             if len(Eu) == Eu_len:
                 break
 
-            # place current grouped stages into the server
-            place(servers, job, Eg)
-            Eg = []
-
     elif strategy == Strategy.AVERAGE:
 
         # All stages have the same Dop
-        for stage in job.stages.values():
+        for id, stage in job.stages.items():
             stage.nslot = round(job.nslot / len(list(job.stages.keys())))
 
             # Randomly place each stage into available server
             for server in servers:
-                if server.can_place(stage):
-                    server.place(stage)
+                if server.can_place((id, stage)):
+                    server.place((id, stage))
 
     elif strategy == Strategy.RATIO:
 
         # Compute k, which is the propotion
         total_alpha = 0
-        for stage in job.stages.values():
+        for id, stage in job.stages.items():
             total_alpha += stage.alpha
 
         # Stage Dop is propotional to the stage alpha value
-        for stage in job.stages.values():
+        for id, stage in job.stages.items():
             try:
                 stage.nslot = round(job.nslot * stage.alpha / total_alpha)
             except ZeroDivisionError:
@@ -145,8 +142,8 @@ def joint_optimization(job: Job, servers: List[Server], strategy: Strategy) -> f
 
             # Randomly place each stage into available server
             for server in servers:
-                if server.can_place(stage):
-                    server.place(stage)
+                if server.can_place((id, stage)):
+                    server.place((id, stage))
 
     '''
     For JCT optimization, the weight of node 𝑠𝑖 is 𝐶(𝑠𝑖), and the weight of (𝑠𝑖, 𝑠𝑗) is 𝑊 (𝑠𝑖) + 𝑅(𝑠𝑗).
@@ -186,55 +183,59 @@ def build_group_stages(job : Job, Eg : List[Tuple[int, int]]) -> Set[Stage]:
     servers : Avaliable server with constraints
     job: current job
     Eg: current grouped stages represented with edges
-
-    Note: grouped stages may not be fully connected
 '''
-def can_place(servers : List[Server], job : Job, Eg : List[Tuple[int, int]]) -> bool:
-
-    group_stages = build_group_stages(job, Eg)
-    for stage in group_stages.copy():
-        # Check if s is placed somewhere in the server list
-        for server in servers:
-            if stage in server.placed_stages:
-                group_stages.remove(stage)
-                break
-
-    total_slots_need = 0
-    for stage in group_stages:
-        total_slots_need += stage.nslot
-
-    for server in servers:
-        if server.available_slots >= total_slots_need:
-            return True
-
-    return False
-
-
-def place(servers : List[Server], job : Job, Eg : List[Tuple[int, int]]) -> None:
-
-    group_stages = build_group_stages(job, Eg)
-    for stage in group_stages.copy():
-        # Check if s is placed somewhere in the server list
-        for server in servers:
-            if stage in server.placed_stages:
-                group_stages.remove(stage)
-                break
-
-    total_slots_need = 0
-    for stage in group_stages:
-        total_slots_need += stage.nslot
+def place(servers : List[Server], job : Job, Eg : Tuple[int, int]) -> bool:
 
     # sort server based on the curret available slots:
     sorted_servers = sorted(servers, key=lambda server: server.available_slots, reverse=True)
 
-    # Place the group into the server with the nearest function slot number
+    start_placed_server = -1
+    end_placed_server = -1
+    start_stage = job.stages[Eg[0]]
+    end_stage = job.stages[Eg[1]]
+
+    # Check if stage is placed somewhere in the server list
+    for i, server in enumerate(servers):
+        if Eg[0] in server.placed_stages:
+            start_placed_server = i
+        if Eg[1] in server.placed_stages:
+            end_placed_server = i
+
     chosen_server = None
-    for server in sorted_servers:
-        if server.available_slots >= total_slots_need:
-            chosen_server = server
-        else:
+    if start_placed_server >= 0 and end_placed_server >= 0:
+        return True
+
+    elif start_placed_server < 0 and end_placed_server < 0:
+        total_slots_need = start_stage.nslot + end_stage.nslot
+
+        # Place the group into the server with the nearest function slot number
+        for server in sorted_servers:
+            if server.available_slots >= total_slots_need:
+                chosen_server = server
+            else:
+                if chosen_server:
+                    chosen_server.available_slots -= total_slots_need
+                    chosen_server.placed_stages[Eg[0]] = start_stage
+                    chosen_server.placed_stages[Eg[1]] = end_stage
+
+    elif start_placed_server >= 0 and end_placed_server < 0:
+        total_slots_need = end_stage.nslot
+
+        if servers[start_placed_server].available_slots >= total_slots_need:
+            chosen_server = servers[start_placed_server]
             chosen_server.available_slots -= total_slots_need
-            chosen_server.placed_stages += group_stages
+            chosen_server.placed_stages[Eg[1]] = end_stage
+
+    elif start_placed_server < 0 and end_placed_server >= 0:
+        total_slots_need = start_stage.nslot
+
+        if servers[end_placed_server].available_slots >= total_slots_need:
+            chosen_server = servers[end_placed_server]
+            chosen_server.available_slots -= total_slots_need
+            chosen_server.placed_stages[Eg[0]] = start_stage
+
+    if not chosen_server: return False
+    return True
 
 
 '''
