@@ -3,11 +3,17 @@ from math import pow
 
 def merge_stage(alpha_i:float, alpha_j:float, has_edge:bool):
     if has_edge:
-        rate = pow(alpha_i/alpha_j,0.5)
+        try:
+            rate = pow(alpha_i/alpha_j,0.5)
+        except ZeroDivisionError:
+            rate = 0
         alpha_s = pow(pow(alpha_i,0.5)+pow(alpha_j,0.5),2)
         return alpha_s, rate    
     
-    rate = alpha_i/alpha_j
+    try:
+        rate = alpha_i/alpha_j
+    except ZeroDivisionError:
+        rate = 0
     alpha_s = alpha_i+alpha_j
     return alpha_s,rate
 
