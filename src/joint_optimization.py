@@ -156,7 +156,7 @@ def joint_optimization(job: Job, servers: List[Server], strategy: Strategy) -> f
     total_execution_time = 0
 
     # Find current graph critical path to compute total time
-    critical_path_edge_attributes = longest_path_dag_with_weights_and_path(list(job.stages.keys()), job.edges)
+    critical_path_edge_attributes = longest_path_dag_with_weights_and_path(job.stages, job.edges)
 
     for i in range(len(critical_path_edge_attributes)):
         start_stage = job.stages[critical_path_edge_attributes[i][1]]
@@ -260,7 +260,7 @@ def greedy_group(job : Job):
 
     while E:
         # find the critical path of the DAG (V, E)
-        critical_path_edge_attributes = longest_path_dag_with_weights_and_path(list(job.stages.keys()), job.edges)
+        critical_path_edge_attributes = longest_path_dag_with_weights_and_path(job.stages, job.edges)
 
         # find the edge with the largest weight in 𝐶𝑃
         max_weight = 0
@@ -283,27 +283,30 @@ def greedy_group(job : Job):
 
 '''
     Find critical path in current DAG
+    path length includes both node cost and weight cost
     return : list[(si, sj, w)]
 '''
-def longest_path_dag_with_weights_and_path(nodes : List[int], edges : Dict[Tuple[int, int], float]) -> List[Tuple[int, int, float]]:
+def longest_path_dag_with_weights_and_path(nodes : Dict[int, Stage], edges : Dict[Tuple[int, int], float]) -> List[Tuple[int, int, float]]:
 
     # find path starting points
-    graph = {node: [] for node in nodes}
-    in_degree = {node: 0 for node in nodes}
-    edge_costs = {node: [] for node in nodes}
+    graph = {node: [] for node in nodes.keys()}
+    in_degree = {node: 0 for node in nodes.keys()}
+    edge_costs = {node: [] for node in nodes.keys()}
+    node_costs = {node: stage.alpha / stage.nslot + stage.beta for node, stage in nodes.items()}
 
     for edge, weight in edges.items():
         in_degree[edge[1]] += 1
         graph[edge[0]].append(edge[1])
         edge_costs[edge[0]].append(weight)
 
-    path = {node: [] for node in nodes}
-    distance_with_cost = {node: 0 for node in nodes}
-    start_nodes = [node for node in nodes if in_degree[node] == 0]
+    path = {node: [] for node in nodes.keys()}
+    distance_with_cost = {node: 0 for node in nodes.keys()}
+    start_nodes = [node for node in nodes.keys() if in_degree[node] == 0]
 
     for root_node in start_nodes:
         path[root_node].append(root_node)
-        dfs_with_weights_and_path(root_node, graph, edge_costs, in_degree, path, distance_with_cost)
+        distance_with_cost[root_node] = node_costs[root_node]
+        dfs_with_weights_and_path(root_node, graph, edge_costs, node_costs, in_degree, path, distance_with_cost)
 
     max_node = max(distance_with_cost, key=distance_with_cost.get)
     critical_path = path[max_node]
@@ -316,7 +319,7 @@ def longest_path_dag_with_weights_and_path(nodes : List[int], edges : Dict[Tuple
     return critical_path_edge_attributes
 
 
-def dfs_with_weights_and_path(root_node, graph, edge_costs, in_degree, path, distance_with_cost):
+def dfs_with_weights_and_path(root_node, graph, edge_costs, node_costs, in_degree, path, distance_with_cost):
 
     for i, neighbor in enumerate(graph[root_node]):
 
@@ -326,14 +329,14 @@ def dfs_with_weights_and_path(root_node, graph, edge_costs, in_degree, path, dis
         # print(neighbor, in_degree[neighbor])
         in_degree[neighbor] -= 1
 
-        new_distance = distance_with_cost[root_node] + edge_costs[root_node][i]
+        new_distance = distance_with_cost[root_node] + edge_costs[root_node][i] + node_costs[neighbor]
 
         if new_distance > distance_with_cost[neighbor]:
             path[neighbor] = path[root_node] + [neighbor]
             distance_with_cost[neighbor] = new_distance
 
         if in_degree[neighbor] == 0:
-            dfs_with_weights_and_path(neighbor, graph, edge_costs, in_degree, path, distance_with_cost)
+            dfs_with_weights_and_path(neighbor, graph, edge_costs, node_costs, in_degree, path, distance_with_cost)
 
 
 '''
