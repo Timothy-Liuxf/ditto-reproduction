@@ -5,104 +5,104 @@
             {
                 "name": "store_returns",
                 "type": "select",
-                "alpha": 0,
-                "beta": 0,
+                "alpha": 100,
+                "beta": 10,
                 "children": [
                     {
                         "name": "sr_customer_sk_sr_store_sk",
-                        "weight": 0
+                        "weight": 15
                     }
                 ]
             },
             {
                 "name": "date_dim",
                 "type": "select",
-                "alpha": 0,
-                "beta": 0,
+                "alpha": 50,
+                "beta": 8,
                 "children": [
                     {
                         "name": "sr_customer_sk_sr_store_sk",
-                        "weight": 0
+                        "weight": 12
                     }
                 ]
             },
             {
                 "name": "customer_total_return_ctr1",
                 "type": "select",
-                "alpha": 0,
-                "beta": 0,
+                "alpha": 200,
+                "beta": 38,
                 "children": [
                     {
                         "name": "store",
-                        "weight": 0
+                        "weight": 20
                     },
                     {
                         "name": "c_customer_id",
-                        "weight": 0
+                        "weight": 18
                     }
                 ]
             },
             {
                 "name": "sr_customer_sk_sr_store_sk",
                 "type": "groupby",
-                "alpha": 0,
-                "beta": 0,
+                "alpha": 160,
+                "beta": 35,
                 "children": [
                     {
                         "name": "customer_total_return_ctr1",
-                        "weight": 0
+                        "weight": 28
                     },
                     {
                         "name": "customer_total_return_ctr2",
-                        "weight": 0
+                        "weight": 28
                     }
                 ]
             },
             {
                 "name": "customer_total_return_ctr2",
                 "type": "select",
-                "alpha": 0,
-                "beta": 0,
+                "alpha": 180,
+                "beta": 34,
                 "children": [
                     {
                         "name": "customer_total_return_ctr1",
-                        "weight": 0
+                        "weight": 23
                     }
                 ]
             },
             {
                 "name": "store",
                 "type": "select",
-                "alpha": 0,
-                "beta": 0,
+                "alpha": 80,
+                "beta": 8,
                 "children": [
                     {
                         "name": "c_customer_id",
-                        "weight": 0
+                        "weight": 9
                     }
                 ]
             },
             {
                 "name": "customer",
                 "type": "select",
-                "alpha": 0,
-                "beta": 0,
+                "alpha": 125,
+                "beta": 24,
                 "children": [
                     {
                         "name": "customer_total_return_ctr1",
-                        "weight": 0
+                        "weight": 20
                     },
                     {
                         "name": "c_customer_id",
-                        "weight": 0
+                        "weight": 27
                     }
                 ]
             },
             {
                 "name": "c_customer_id",
                 "type": "orderby",
-                "alpha": 0,
-                "beta": 0,
+                "alpha": 213,
+                "beta": 32,
                 "children": []
             }
         ]
@@ -113,104 +113,214 @@
             {
                 "name": "map1",
                 "type": "map",
-                "alpha": 0,
-                "beta": 0,
+                "alpha": 100,
+                "beta": 20,
                 "children": [
                     {
                         "name": "groupby",
-                        "weight": 0
+                        "weight": 20
                     }
                 ]
             },
             {
                 "name": "groupby",
                 "type": "groupby",
-                "alpha": 0,
-                "beta": 0,
+                "alpha": 200,
+                "beta": 32,
                 "children": [
                     {
                         "name": "reduce1",
-                        "weight": 0
+                        "weight": 33
                     }
                 ]
             },
             {
                 "name": "reduce1",
                 "type": "reduce",
-                "alpha": 0,
-                "beta": 0,
+                "alpha": 130,
+                "beta": 22,
                 "children": [
                     {
                         "name": "join1",
-                        "weight": 0
+                        "weight": 12
                     }
                 ]
             },
             {
                 "name": "map2",
                 "type": "map",
-                "alpha": 0,
-                "beta": 0,
+                "alpha": 88,
+                "beta": 18,
                 "children": [
                     {
                         "name": "join1",
-                        "weight": 0
+                        "weight": 16
                     }
                 ]
             },
             {
                 "name": "map3",
                 "type": "map",
-                "alpha": 0,
-                "beta": 0,
+                "alpha": 168,
+                "beta": 22,
                 "children": [
                     {
                         "name": "join1",
-                        "weight": 0
+                        "weight": 21
                     }
                 ]
             },
             {
                 "name": "map4",
                 "type": "map",
-                "alpha": 0,
-                "beta": 0,
+                "alpha": 63,
+                "beta": 7,
                 "children": [
                     {
                         "name": "join2",
-                        "weight": 0
+                        "weight": 11
                     }
                 ]
             },
             {
                 "name": "join1",
                 "type": "join",
-                "alpha": 0,
-                "beta": 0,
+                "alpha": 326,
+                "beta": 48,
                 "children": [
                     {
                         "name": "join2",
-                        "weight": 0
+                        "weight": 33
                     }
                 ]
             },
             {
                 "name": "join2",
                 "type": "join",
-                "alpha": 0,
-                "beta": 0,
+                "alpha": 245,
+                "beta": 40,
                 "children": [
                     {
                         "name": "reduce2",
-                        "weight": 0
+                        "weight": 36
                     }
                 ]
             },
             {
                 "name": "reduce2",
                 "type": "reduce",
-                "alpha": 0,
-                "beta": 0,
+                "alpha": 64,
+                "beta": 26,
+                "children": []
+            }
+        ]
+    },
+    {
+        "name": "t0",
+        "stages": [
+            {
+                "name": "s0",
+                "type": "stage",
+                "alpha": 136,
+                "beta": 43,
+                "children": [
+                    {
+                        "name": "s1",
+                        "weight": 20
+                    },
+                    {
+                        "name": "s5",
+                        "weight": 36
+                    }
+                ]
+            },
+            {
+                "name": "s1",
+                "type": "stage",
+                "alpha": 236,
+                "beta": 41,
+                "children": [
+                    {
+                        "name": "s2",
+                        "weight": 12
+                    },
+                    {
+                        "name": "s3",
+                        "weight": 35
+                    }
+                ]
+            },
+            {
+                "name": "s2",
+                "type": "stage",
+                "alpha": 88,
+                "beta": 24,
+                "children": [
+                    {
+                        "name": "s4",
+                        "weight": 22
+                    }
+                ]
+            },
+            {
+                "name": "s3",
+                "type": "stage",
+                "alpha": 166,
+                "beta": 34,
+                "children": []
+            },
+            {
+                "name": "s4",
+                "type": "stage",
+                "alpha": 124,
+                "beta": 26,
+                "children": [
+                    {
+                        "name": "s8",
+                        "weight": 12
+                    }
+                ]
+            },
+            {
+                "name": "s5",
+                "type": "stage",
+                "alpha": 203,
+                "beta": 14,
+                "children": [
+                    {
+                        "name": "s4",
+                        "weight": 32
+                    },
+                    {
+                        "name": "s6",
+                        "weight": 26
+                    }
+                ]
+            },
+            {
+                "name": "s6",
+                "type": "stage",
+                "alpha": 93,
+                "beta": 35,
+                "children": [
+                    {
+                        "name": "s7",
+                        "weight": 24
+                    }
+                ]
+            },
+            {
+                "name": "s7",
+                "type": "stage",
+                "alpha": 125,
+                "beta": 26,
+                "children": []
+            },
+            {
+                "name": "s8",
+                "type": "stage",
+                "alpha": 86,
+                "beta": 14,
                 "children": []
             }
         ]

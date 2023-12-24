@@ -1,7 +1,10 @@
 import argparse
 import json
 from joint_optimization import *
-from typing import Dict
+from typing import List, Dict
+
+def copy_server_pool(server_pool: List[Server]) -> List[Server]:
+    return [server.copy() for server in server_pool]
 
 def main():
     parser = argparse.ArgumentParser()
@@ -39,10 +42,32 @@ def main():
         # print("Stages: {}".format(stages))
         # print("Edges: {}".format(edges))
 
-        job = Job(stages, edges, 100) # TODO: Change nslots
-        print("Ditto: {}".format(joint_optimization(job.copy(), [], Strategy.DITTO)))
-        print("Average: {}".format(joint_optimization(job.copy(), [], Strategy.AVERAGE)))
-        print("Ratio: {}".format(joint_optimization(job.copy(), [], Strategy.RATIO)))
+        nslots = 100
+        job = Job(stages, edges, nslots)
+        server_pool = [
+            Server(16),
+            Server(9),
+            Server(5),
+            Server(13),
+            Server(11),
+            Server(7),
+            Server(3),
+            Server(24),
+            Server(4),
+            Server(6),
+            Server(16),
+            Server(1),
+            Server(3),
+            Server(20),
+        ]
+
+        # test legality: sum(server_pool) >= nslots
+        total_slots = sum(server.total_slots for server in server_pool)
+        assert total_slots >= nslots
+
+        print("Ditto: {}".format(joint_optimization(job.copy(), copy_server_pool(server_pool), Strategy.DITTO)))
+        print("Average: {}".format(joint_optimization(job.copy(), copy_server_pool(server_pool), Strategy.AVERAGE)))
+        print("Ratio: {}".format(joint_optimization(job.copy(), copy_server_pool(server_pool), Strategy.RATIO)))
         print()
 
 if __name__ == "__main__":
