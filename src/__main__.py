@@ -42,22 +42,22 @@ def main():
         # print("Stages: {}".format(stages))
         # print("Edges: {}".format(edges))
 
-        nslots = 100
+        nslots = 120
         job = Job(stages, edges, nslots)
         server_slots = [
             16,
-            9,
-            5,
+            29,
+            25,
             13,
-            11,
-            7,
-            3,
+            31,
+            47,
+            33,
             24,
             4,
-            6,
+            26,
             16,
             1,
-            3,
+            33,
             20,
         ]
         # test legality: sum(server_pool) >= nslots
