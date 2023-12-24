@@ -44,26 +44,26 @@ def main():
 
         nslots = 100
         job = Job(stages, edges, nslots)
-        server_pool = [
-            Server(16),
-            Server(9),
-            Server(5),
-            Server(13),
-            Server(11),
-            Server(7),
-            Server(3),
-            Server(24),
-            Server(4),
-            Server(6),
-            Server(16),
-            Server(1),
-            Server(3),
-            Server(20),
+        server_slots = [
+            16,
+            9,
+            5,
+            13,
+            11,
+            7,
+            3,
+            24,
+            4,
+            6,
+            16,
+            1,
+            3,
+            20,
         ]
-
         # test legality: sum(server_pool) >= nslots
-        total_slots = sum(server.total_slots for server in server_pool)
+        total_slots = sum(n for n in server_slots)
         assert total_slots >= nslots
+        server_pool = [Server(n) for n in server_slots]
 
         print("Ditto: {}".format(joint_optimization(job.copy(), copy_server_pool(server_pool), Strategy.DITTO)))
         print("Average: {}".format(joint_optimization(job.copy(), copy_server_pool(server_pool), Strategy.AVERAGE)))
