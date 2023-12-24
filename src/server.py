@@ -15,3 +15,6 @@ class Server:
         assert self.can_place(stage)
         self.available_slots -= stage.nslot
         self.placed_stages.append(stage)
+    
+    def copy(self):
+        return Server(self.total_slots)
