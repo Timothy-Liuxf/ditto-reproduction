@@ -6,55 +6,55 @@
                 "name": "store_returns",
                 "type": "select",
                 "alpha": 100,
-                "beta": 10,
+                "beta": 2,
                 "children": [
                     {
                         "name": "sr_customer_sk_sr_store_sk",
-                        "weight": 15
+                        "weight": 20
                     }
                 ]
             },
             {
                 "name": "date_dim",
                 "type": "select",
-                "alpha": 50,
-                "beta": 8,
+                "alpha": 75,
+                "beta": 2,
                 "children": [
                     {
                         "name": "sr_customer_sk_sr_store_sk",
-                        "weight": 12
+                        "weight": 9
                     }
                 ]
             },
             {
                 "name": "customer_total_return_ctr1",
                 "type": "select",
-                "alpha": 200,
-                "beta": 38,
+                "alpha": 220,
+                "beta": 9,
                 "children": [
                     {
                         "name": "store",
-                        "weight": 20
+                        "weight": 15
                     },
                     {
                         "name": "c_customer_id",
-                        "weight": 18
+                        "weight": 13
                     }
                 ]
             },
             {
                 "name": "sr_customer_sk_sr_store_sk",
                 "type": "groupby",
-                "alpha": 160,
-                "beta": 35,
+                "alpha": 360,
+                "beta": 8,
                 "children": [
                     {
                         "name": "customer_total_return_ctr1",
-                        "weight": 28
+                        "weight": 21
                     },
                     {
                         "name": "customer_total_return_ctr2",
-                        "weight": 28
+                        "weight": 21
                     }
                 ]
             },
@@ -62,23 +62,23 @@
                 "name": "customer_total_return_ctr2",
                 "type": "select",
                 "alpha": 180,
-                "beta": 34,
+                "beta": 8,
                 "children": [
                     {
                         "name": "customer_total_return_ctr1",
-                        "weight": 23
+                        "weight": 19
                     }
                 ]
             },
             {
                 "name": "store",
                 "type": "select",
-                "alpha": 80,
-                "beta": 8,
+                "alpha": 120,
+                "beta": 12,
                 "children": [
                     {
                         "name": "c_customer_id",
-                        "weight": 9
+                        "weight": 26
                     }
                 ]
             },
@@ -86,15 +86,15 @@
                 "name": "customer",
                 "type": "select",
                 "alpha": 125,
-                "beta": 24,
+                "beta": 6,
                 "children": [
                     {
                         "name": "customer_total_return_ctr1",
-                        "weight": 20
+                        "weight": 15
                     },
                     {
                         "name": "c_customer_id",
-                        "weight": 27
+                        "weight": 19
                     }
                 ]
             },
@@ -102,7 +102,7 @@
                 "name": "c_customer_id",
                 "type": "orderby",
                 "alpha": 213,
-                "beta": 32,
+                "beta": 8,
                 "children": []
             }
         ]
@@ -114,11 +114,11 @@
                 "name": "map1",
                 "type": "map",
                 "alpha": 100,
-                "beta": 20,
+                "beta": 5,
                 "children": [
                     {
                         "name": "groupby",
-                        "weight": 20
+                        "weight": 10
                     }
                 ]
             },
@@ -126,11 +126,11 @@
                 "name": "groupby",
                 "type": "groupby",
                 "alpha": 200,
-                "beta": 32,
+                "beta": 8,
                 "children": [
                     {
                         "name": "reduce1",
-                        "weight": 33
+                        "weight": 16
                     }
                 ]
             },
@@ -138,11 +138,11 @@
                 "name": "reduce1",
                 "type": "reduce",
                 "alpha": 130,
-                "beta": 22,
+                "beta": 5,
                 "children": [
                     {
                         "name": "join1",
-                        "weight": 12
+                        "weight": 6
                     }
                 ]
             },
@@ -150,11 +150,11 @@
                 "name": "map2",
                 "type": "map",
                 "alpha": 88,
-                "beta": 18,
+                "beta": 4,
                 "children": [
                     {
                         "name": "join1",
-                        "weight": 16
+                        "weight": 8
                     }
                 ]
             },
@@ -162,11 +162,11 @@
                 "name": "map3",
                 "type": "map",
                 "alpha": 168,
-                "beta": 22,
+                "beta": 5,
                 "children": [
                     {
                         "name": "join1",
-                        "weight": 21
+                        "weight": 10
                     }
                 ]
             },
@@ -174,11 +174,11 @@
                 "name": "map4",
                 "type": "map",
                 "alpha": 63,
-                "beta": 7,
+                "beta": 2,
                 "children": [
                     {
                         "name": "join2",
-                        "weight": 11
+                        "weight": 5
                     }
                 ]
             },
@@ -186,11 +186,11 @@
                 "name": "join1",
                 "type": "join",
                 "alpha": 326,
-                "beta": 48,
+                "beta": 12,
                 "children": [
                     {
                         "name": "join2",
-                        "weight": 33
+                        "weight": 16
                     }
                 ]
             },
@@ -198,19 +198,19 @@
                 "name": "join2",
                 "type": "join",
                 "alpha": 245,
-                "beta": 40,
+                "beta": 10,
                 "children": [
                     {
                         "name": "reduce2",
-                        "weight": 36
+                        "weight": 18
                     }
                 ]
             },
             {
                 "name": "reduce2",
                 "type": "reduce",
-                "alpha": 64,
-                "beta": 26,
+                "alpha": 32,
+                "beta": 6,
                 "children": []
             }
         ]
@@ -222,15 +222,15 @@
                 "name": "s0",
                 "type": "stage",
                 "alpha": 136,
-                "beta": 43,
+                "beta": 11,
                 "children": [
                     {
                         "name": "s1",
-                        "weight": 20
+                        "weight": 15
                     },
                     {
                         "name": "s5",
-                        "weight": 36
+                        "weight": 27
                     }
                 ]
             },
@@ -238,15 +238,15 @@
                 "name": "s1",
                 "type": "stage",
                 "alpha": 236,
-                "beta": 41,
+                "beta": 10,
                 "children": [
                     {
                         "name": "s2",
-                        "weight": 12
+                        "weight": 9
                     },
                     {
                         "name": "s3",
-                        "weight": 35
+                        "weight": 25
                     }
                 ]
             },
@@ -254,11 +254,11 @@
                 "name": "s2",
                 "type": "stage",
                 "alpha": 88,
-                "beta": 24,
+                "beta": 6,
                 "children": [
                     {
                         "name": "s4",
-                        "weight": 22
+                        "weight": 16
                     }
                 ]
             },
@@ -266,18 +266,18 @@
                 "name": "s3",
                 "type": "stage",
                 "alpha": 166,
-                "beta": 34,
+                "beta": 8,
                 "children": []
             },
             {
                 "name": "s4",
                 "type": "stage",
                 "alpha": 124,
-                "beta": 26,
+                "beta": 6,
                 "children": [
                     {
                         "name": "s8",
-                        "weight": 12
+                        "weight": 9
                     }
                 ]
             },
@@ -285,15 +285,15 @@
                 "name": "s5",
                 "type": "stage",
                 "alpha": 203,
-                "beta": 14,
+                "beta": 3,
                 "children": [
                     {
                         "name": "s4",
-                        "weight": 32
+                        "weight": 24
                     },
                     {
                         "name": "s6",
-                        "weight": 26
+                        "weight": 19
                     }
                 ]
             },
@@ -301,11 +301,11 @@
                 "name": "s6",
                 "type": "stage",
                 "alpha": 93,
-                "beta": 35,
+                "beta": 9,
                 "children": [
                     {
                         "name": "s7",
-                        "weight": 24
+                        "weight": 18
                     }
                 ]
             },
@@ -313,14 +313,14 @@
                 "name": "s7",
                 "type": "stage",
                 "alpha": 125,
-                "beta": 26,
+                "beta": 6,
                 "children": []
             },
             {
                 "name": "s8",
                 "type": "stage",
                 "alpha": 86,
-                "beta": 14,
+                "beta": 4,
                 "children": []
             }
         ]
