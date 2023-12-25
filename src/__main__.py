@@ -7,7 +7,7 @@ from typing import List, Dict
 def copy_server_pool(server_pool: List[Server]) -> List[Server]:
     return [server.copy() for server in server_pool]
 
-def main():
+def evaluation(nslots: int, server_slots: List[int]):
     parser = argparse.ArgumentParser()
     parser.add_argument("-f", "--file", help="Input file for DAGs")
     args = parser.parse_args()
@@ -43,25 +43,8 @@ def main():
         # print("Stages: {}".format(stages))
         # print("Edges: {}".format(edges))
 
-        nslots = 120
         job = Job(stages, edges, nslots)
-        server_slots = [
-            16,
-            29,
-            25,
-            13,
-            31,
-            47,
-            33,
-            24,
-            4,
-            26,
-            16,
-            1,
-            33,
-            20,
-        ]
-        # print(len(server_slots))
+
         # test legality: sum(server_pool) >= nslots
         total_slots = sum(n for n in server_slots)
         assert total_slots >= nslots
@@ -83,6 +66,47 @@ def main():
         print(f"Ratio: {ratio_time}, execution time: {end_time_ratio - start_time_ratio}")
         print(f"Average: {average_time}, execution time: {end_time_average - start_time_average}")
         print()
+
+def main():
+    nslots = 120
+    server_slots = [
+        16,
+        29,
+        25,
+        13,
+        31,
+        47,
+        33,
+        24,
+        4,
+        26,
+        16,
+        1,
+        33,
+        20,
+    ]
+    # print(len(server_slots))
+    evaluation(nslots, server_slots)
+
+    print("===========================")
+
+    server_slots = [
+        12,
+        11,
+        15,
+        13,
+        18,
+        17,
+        19,
+        14,
+        24,
+        16,
+        16,
+        11,
+        13,
+        10,
+    ]
+    evaluation(nslots, server_slots)
 
 if __name__ == "__main__":
     main()
